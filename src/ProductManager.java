@@ -104,22 +104,39 @@ public class ProductManager {
   }
 
   public List<Product> getActiveProductsSortedByPrice() {
-    // ProductStatus'ü ACTIVE olan ürünleri fiyatlarına göre sıralayıp döndüren metodu yazın
-    return null;
-  }
+		// ProductStatus'ü ACTIVE olan ürünleri fiyatlarına göre sıralayıp döndüren
+		// metodu yazın
+		
+		
+		Comparator<Product> compareByPrice = Comparator.comparing(Product::getPrice);
+		List<Product> activeProductsSortedByPrice = products.values().stream()
+				.filter(product -> ProductStatus.ACTIVE.equals(product.getProductStatus())).sorted(compareByPrice)
+				.toList();
 
-  public double calculateAveragePriceInCategory(String category) {
-    // String olarak verilen category'e ait olan ürünlerin fiyatlarının ortalamasını yoksa 0.0 döndüren metodu yazın
-    // tip: OptionalDouble kullanımını inceleyin.
-    return 0.0;
-  }
+		return activeProductsSortedByPrice;
+	}
 
-  public Map<String, Double> getCategoryPriceSum() {
-    // category'lere göre gruplayıp, her bir kategoride bulunan ürünlerin toplam fiyatını stream ile hesaplayıp
-    // döndüren metodu yazın
-    // örn:
-    // category-1 105.2
-    // category-2 45.0
-    return null;
-  }
+	public double calculateAveragePriceInCategory(String category) {
+		// String olarak verilen category'e ait olan ürünlerin fiyatlarının ortalamasını
+		// yoksa 0.0 döndüren metodu yazın
+		// tip: OptionalDouble kullanımını inceleyin.
+		
+		double averagePriceForSelectedCategory = products.values().stream().filter(product -> product.getCategory().equals(category))
+				.mapToDouble(product -> product.getPrice()).average().orElse(0.0);
+		return averagePriceForSelectedCategory;
+
+	}
+
+	public Map<String, Double> getCategoryPriceSum() {
+		// category'lere göre gruplayıp, her bir kategoride bulunan ürünlerin toplam
+		// fiyatını stream ile hesaplayıp
+		// döndüren metodu yazın
+		// örn:
+		// category-1 105.2
+		// category-2 45.0
+		// return
+		Map<String, Double> priceSumByCategory = products.values().stream().collect(Collectors
+				.groupingBy(Product::getCategory, Collectors.summingDouble(p -> p.getPrice() * p.getStock())));
+		return priceSumByCategory;
+	}
 }
